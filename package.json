@@ -1,0 +1,29 @@
+{
+  "name": "my-backend-project",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "PORT=4005 nodemon -r ts-node/register -r tsconfig-paths/register src/index.ts",
+    "start": "node dist/index.js",
+    "lint": "eslint 'src/**/*.ts'",
+    "migrate": "ts-node src/model.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "moleculer": "^0.14.28",
+    "moleculer-web": "^0.10.6",
+    "nodenv": "^0.1.0",
+    "pg": "^8.11.3",
+    "reflect-metadata": "^0.2.2",
+    "tsconfig-paths": "^4.2.0",
+    "typeorm": "^0.3.17"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
