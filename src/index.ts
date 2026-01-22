@@ -5,6 +5,7 @@ import * as path from 'path';
 
 // Определяем расширение файлов в зависимости от окружения
 const isProduction = process.env.NODE_ENV === 'production';
+const port = isProduction ? process.env.RAILWAY_PORT : process.env.PORT;
 
 console.log('isProduction', isProduction);
 const broker = new ServiceBroker({
@@ -13,6 +14,7 @@ const broker = new ServiceBroker({
   // Отключаем hot reload в продакшене
   hotReload: !isProduction,
 });
+
 
 // Загружаем сервисы с правильными путями
 const services = [
@@ -40,7 +42,7 @@ broker.createService({
   name: 'gateway',
   mixins: [ApiGateway],
   settings: {
-    port: process.env.PORT ? parseInt(process.env.PORT) : 4005,
+    port,
 
     cors: {
       origin: '*',
@@ -113,10 +115,8 @@ async function startServer() {
     console.log('Starting Moleculer broker...');
     await broker.start();
 
-    console.log(`Server started on port ${process.env.PORT || 4005}`);
-    console.log(
-      `Open http://localhost:${process.env.PORT || 4005}/api/users in your browser`,
-    );
+    console.log(`Server started on port ${port}`);
+
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
