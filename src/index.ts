@@ -6,6 +6,7 @@ import * as path from 'path';
 // Определяем расширение файлов в зависимости от окружения
 const isProduction = process.env.NODE_ENV === 'production';
 
+console.log('isProduction', isProduction);
 const broker = new ServiceBroker({
   logger: true,
   logLevel: 'info',
@@ -21,6 +22,7 @@ const services = [
 ];
 
 for (const serviceName of services) {
+  console.log('__dirname', __dirname);
   if (isProduction) {
     // В продакшене загружаем из dist
     broker.loadService(path.join(__dirname, 'services', `${serviceName}.js`));
