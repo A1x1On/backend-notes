@@ -8,51 +8,51 @@ dotenv.config();
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Используем переменные окружения Railway или значения по умолчанию
-// const dbConfig = {
-//   type: 'postgres' as const,
-//   url: process.env.DATABASE_URL, // Railway предоставляет DATABASE_URL
-//   host: process.env.DB_HOST || 'gondola.proxy.rlwy.net',
-//   port: parseInt(process.env.DB_PORT || '59825'),
-//   database: process.env.DB_NAME || 'NOTE',
-//   username: process.env.DB_USER || 'user',
-//   password: process.env.DB_PASSWORD || '123456789',
-//   synchronize: false,
-//   logging: !isProduction, // Логи только в разработке
-// };
+// Получаем конфигурацию подключения
+const getConnectionOptions = () => {
+  // Если есть DATABASE_URL (Railway предоставляет его)
+  if (process.env.DATABASE_URL) {
+    return {
+      url: process.env.DATABASE_URL,
+      extra: {
+        ssl: {
+          rejectUnauthorized: false,
+          require: true
+        }
+      }
+    };
+  }
+  
+  // Если нет DATABASE_URL, используем прямую конфигурацию
+  return {
+    host: process.env.DB_HOST || 'gondola.proxy.rlwy.net',
+    port: parseInt(process.env.DB_PORT || '59825'),
+    database: process.env.DB_NAME || 'NOTE',
+    username: process.env.DB_USER || 'user',
+    password: process.env.DB_PASSWORD || '123456789',
+    extra: {
+      ssl: isProduction 
+        ? { 
+            rejectUnauthorized: false,
+            require: true
+          } 
+        : false
+    }
+  };
+};
 
 export const AppDataSource = new DataSource({
-  // ...dbConfig,
-  // Используем DATABASE_URL если он есть (Railway предоставляет)
-  // ...(process.env.DATABASE_URL ? { url: process.env.DATABASE_URL } : {
-  //   host: dbConfig.host,
-  //   port: dbConfig.port,
-  //   database: dbConfig.database,
-  //   username: dbConfig.username,
-  //   password: dbConfig.password,
-
-  type: 'postgres' as const,
-  url: process.env.DATABASE_URL, // Railway предоставляет DATABASE_URL
-  host: process.env.DB_HOST || 'gondola.proxy.rlwy.net',
-  port: parseInt(process.env.DB_PORT || '59825'),
-  database: process.env.DB_NAME || 'NOTE',
-  username: process.env.DB_USER || 'user',
-  password: process.env.DB_PASSWORD || '123456789',
+  type: 'postgres',
+  ...getConnectionOptions(),
   synchronize: false,
-  logging: !isProduction, // Логи только в разработке
-  
+  logging: !isProduction,
   entities: [User, Note],
-  
-  // В продакшене используем .js файлы или отключаем миграции
   migrations: isProduction 
-    ? [path.join(__dirname, '..', 'migrations', '*.js')] // JS файлы
-    : [path.join(__dirname, '..', 'migrations', '*.ts')], // TS файлы
-  
+    ? [path.join(__dirname, '..', 'migrations', '*.js')]
+    : [path.join(__dirname, '..', 'migrations', '*.ts')],
   migrationsTableName: 'migrations',
-  extra: {
-    ssl: isProduction ? { rejectUnauthorized: false } : false,
-  },
 });
+
 
 export const initializeDatabase = async (): Promise<void> => {
   try {
