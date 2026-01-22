@@ -15,10 +15,7 @@ const getConnectionOptions = () => {
     return {
       url: process.env.DATABASE_URL,
       extra: {
-        ssl: {
-          rejectUnauthorized: false,
-          require: true
-        }
+        ssl: false
       }
     };
   }
@@ -31,12 +28,7 @@ const getConnectionOptions = () => {
     username: process.env.DB_USER || 'user',
     password: process.env.DB_PASSWORD || '123456789',
     extra: {
-      ssl: isProduction 
-        ? { 
-            rejectUnauthorized: false,
-            require: true
-          } 
-        : false
+      ssl: false
     }
   };
 };
