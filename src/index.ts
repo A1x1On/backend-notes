@@ -1,21 +1,42 @@
 import 'reflect-metadata';
 import { ServiceBroker } from 'moleculer';
 import { initializeDatabase } from './database/connection';
+import * as path from 'path';
+
+// Определяем расширение файлов в зависимости от окружения
+const isProduction = process.env.NODE_ENV === 'production';
 
 const broker = new ServiceBroker({
   logger: true,
   logLevel: 'info',
+  // Отключаем hot reload в продакшене
+  hotReload: !isProduction,
 });
 
-// Load API service
-broker.loadService('./src/services/api.service.ts');
-broker.loadService('./src/services/user.service.ts');
-broker.loadService('./src/services/note.service.ts');
+// Загружаем сервисы с правильными путями
+const services = [
+  'api.service',
+  'user.service', 
+  'note.service'
+];
+
+for (const serviceName of services) {
+  if (isProduction) {
+    // В продакшене загружаем из dist
+    broker.loadService(path.join(__dirname, 'services', `${serviceName}.js`));
+  } else {
+    // В разработке загружаем из src
+    broker.loadService(`./src/services/${serviceName}.ts`);
+  }
+}
+
+// Импортируем moleculer-web правильно
+import ApiGateway from 'moleculer-web';
 
 // API Gateway service
 broker.createService({
   name: 'gateway',
-  mixins: [require('moleculer-web')],
+  mixins: [ApiGateway],
   settings: {
     port: process.env.PORT ? parseInt(process.env.PORT) : 4005,
 
@@ -82,6 +103,8 @@ broker.createService({
 
 async function startServer() {
   try {
+    console.log(`Starting in ${isProduction ? 'production' : 'development'} mode`);
+    
     console.log('Initializing database...');
     await initializeDatabase();
 
