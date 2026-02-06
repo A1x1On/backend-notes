@@ -20,7 +20,8 @@ const broker = new ServiceBroker({
 const services = [
   'api.service',
   'user.service', 
-  'note.service'
+  'note.service',
+  'code.service'
 ];
 
 for (const serviceName of services) {
@@ -92,6 +93,13 @@ broker.createService({
           'PATCH /:id': 'notes.update',
           'DELETE /:id': 'notes.delete',
         },
+      },
+
+      {
+        path: '/codes',
+        aliases: {
+          'GET ': 'codes.getAll',
+        }
       },
     ],
   },

@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { User } from '../entities/User';
 import { Note } from '../entities/Note';
+import { Code } from '../entities/Code';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
@@ -22,11 +23,11 @@ const getConnectionOptions = () => {
   
   // Если нет DATABASE_URL, используем прямую конфигурацию
   return {
-    host: process.env.DB_HOST || 'gondola.proxy.rlwy.net',
-    port: parseInt(process.env.DB_PORT || '59825'),
-    database: process.env.DB_NAME || 'NOTE',
-    username: process.env.DB_USER || 'user',
-    password: process.env.DB_PASSWORD || '123456789',
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT || ''),
+    database: process.env.DB_NAME,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     extra: {
       ssl: false
     }
@@ -38,7 +39,7 @@ export const AppDataSource = new DataSource({
   ...getConnectionOptions(),
   synchronize: false,
   logging: !isProduction,
-  entities: [User, Note],
+  entities: [User, Note, Code],
   migrations: isProduction 
     ? [path.join(__dirname, '..', 'migrations', '*.js')]
     : [path.join(__dirname, '..', 'migrations', '*.ts')],
