@@ -1,10 +1,7 @@
 import {
-  Unique,
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('codes')
